@@ -14,7 +14,7 @@ from functools import lru_cache
 from multiprocessing import Pool, Lock
 from string import punctuation
 import multiprocessing
-import Levenshtein
+# import Levenshtein
 import numpy as np
 import spacy
 import nltk

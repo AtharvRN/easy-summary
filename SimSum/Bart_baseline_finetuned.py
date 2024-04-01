@@ -5,21 +5,44 @@ from gc import callbacks
 from lib2to3.pgen2 import token
 from pathlib import Path
 from weakref import ref
-import math
+# import math
 from pytorch_lightning.loggers import TensorBoardLogger
 from easse.sari import corpus_sari
 from torch.nn import functional as F
-from preprocessor import tokenize, yield_sentence_pair, yield_lines, load_preprocessor, read_lines, \
-    count_line, OUTPUT_DIR, get_complexity_score, safe_division, get_word2rank, remove_stopwords, remove_punctuation
-import Levenshtein
-import argparse
+# from preprocessor import tokenize, yield_sentence_pair, yield_lines, load_preprocessor, read_lines, \
+#     count_line, OUTPUT_DIR, get_complexity_score, safe_division, get_word2rank, remove_stopwords, remove_punctuation
+
+# from preprocessor import yield_lines,read_lines,OUTPUT_DIR
+
+REPO_DIR = Path(__file__).resolve().parent
+
+OUTPUT_DIR = REPO_DIR / 'output'
+DATASETS_DIR = REPO_DIR / 'data'
+
+def read_lines(filepath):
+    return [line.rstrip() for line in yield_lines(filepath)]
+
+
+def yield_lines(filepath):
+    filepath = Path(filepath)
+    with filepath.open('r') as f:
+        for line in f:
+            yield line.rstrip()
+def get_data_filepath(dataset, phase, type, i=None):
+    suffix = ''
+    if i is not None:
+        suffix = f'.{i}'
+    filename = f'{dataset}.{phase}.{type}{suffix}'
+    return DATASETS_DIR / dataset / filename
+# import Levenshtein
+# import argparse
 from argparse import ArgumentParser
 import os
 import logging
-import random
+# import random
 import nltk
 from preprocessor import  get_data_filepath
-from summarizer import Summarizer
+# from summarizer import Summarizer
 
 nltk.download('punkt')
 

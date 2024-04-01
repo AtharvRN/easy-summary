@@ -11,7 +11,12 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent))
 # -- end fix path --
 
-from preprocessor import WIKI_DOC, D_WIKI, EXP_DIR
+# from preprocessor import WIKI_DOC, D_WIKI, EXP_DIR
+REPO_DIR = Path(__file__).resolve().parent
+EXP_DIR = REPO_DIR / 'experiments'
+
+WIKI_DOC = 'wiki_doc'
+
 import time
 import json
 
@@ -20,8 +25,8 @@ import argparse
 
 from argparse import ArgumentParser
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from optuna.integration import PyTorchLightningPruningCallback
+# from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+# from optuna.integration import PyTorchLightningPruningCallback
 
 #from T5_2 import SumSim, train
 #from Bart2 import SumSim, train
@@ -37,7 +42,7 @@ def parse_arguments():
     #p = SumSim.add_model_specific_args(p)
     p = BartBaseLineFineTuned.add_model_specific_args(p)
     #p = T5BaseLineFineTuned.add_model_specific_args(p)
-    p = pl.Trainer.add_argparse_args(p)
+    # p = pl.Trainer.add_argparse_args(p)
     args,_ = p.parse_known_args()
     return args
 
