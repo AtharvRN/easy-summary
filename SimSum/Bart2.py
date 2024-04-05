@@ -91,8 +91,8 @@ class SumSim(pl.LightningModule):
         self.summarizer = self.summarizer.to(self.args.device)
 
 
-        #self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
-        self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
+        self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
+        # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
         self.simplifier = self.simplifier.model.to(self.args.device)
         self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sim_model)
 
