@@ -111,7 +111,7 @@ class SumSim(pl.LightningModule):
             attention_mask = attention_mask,
             decoder_input_ids = decoder_input_ids,
             decoder_attention_mask =  decoder_attention_mask,
-            labels = labels
+            # labels = labels
         )
 
         return outputs
@@ -145,7 +145,7 @@ class SumSim(pl.LightningModule):
         sum_outputs = self.summarizer(
             input_ids = src_ids,
             attention_mask  = src_mask,
-            labels = labels,
+            # labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
         
@@ -186,7 +186,7 @@ class SumSim(pl.LightningModule):
         sim_outputs  = self(
             input_ids = padded_summary_ids,
             attention_mask = summary_attention_mask,
-            labels = labels,
+            # labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
         #H2 = sim_outputs.encoder_last_hidden_state
