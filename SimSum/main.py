@@ -44,6 +44,7 @@ def parse_arguments():
     #p = T5BaseLineFineTuned.add_model_specific_args(p)
     # p = pl.Trainer.add_argparse_args(p)
     args,_ = p.parse_known_args()
+    print(args)
     return args
 
 # class MetricsCallback(pl.Callback):
