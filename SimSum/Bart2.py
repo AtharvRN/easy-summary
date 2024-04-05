@@ -369,7 +369,7 @@ class SumSim(pl.LightningModule):
                                 drop_last=True,
                                 shuffle=True,
                                 pin_memory=True,
-                                num_workers=4)
+                                num_workers=2)
         t_total = ((len(dataloader.dataset) // (self.args.train_batch_size * max(1, self.args.n_gpu)))
                    // self.args.gradient_accumulation_steps
                    * float(self.args.num_train_epochs)
@@ -390,7 +390,7 @@ class SumSim(pl.LightningModule):
                                  sample_size=self.args.valid_sample_size)
         return DataLoader(val_dataset,
                           batch_size=self.args.valid_batch_size,
-                          num_workers=4)
+                          num_workers=2)
     @staticmethod
     def add_model_specific_args(parent_parser):
       p = ArgumentParser(parents=[parent_parser],add_help = False)
