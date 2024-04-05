@@ -574,10 +574,10 @@ def train(args):
         # early_stop_callback=False,
         # gradient_clip_val=args.max_grad_norm,
         # checkpoint_callback=checkpoint_callback,
-        # callbacks=[
-        #     LoggingCallback(),
-        #     #metrics_callback,
-        #     checkpoint_callback, bar_callback],
+        callbacks=[
+            LoggingCallback(),
+            metrics_callback,
+            checkpoint_callback, bar_callback],
         logger=TensorBoardLogger(f'{args.output_dir}/logs'),
         num_sanity_val_steps=0,  # skip sanity check to save time for debugging purpose
         # plugins='ddp_sharded',
