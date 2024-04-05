@@ -95,6 +95,7 @@ class SumSim(pl.LightningModule):
         # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
         self.simplifier = self.simplifier.model.to(self.args.device)
         self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sim_model)
+        self.automatic_optimization = False
 
 
     def is_logger(self):
@@ -218,6 +219,8 @@ class SumSim(pl.LightningModule):
             - lambda: control the weight of the complexity loss.
             '''
             loss = sim_outputs.loss * self.args.w1
+            self.manual_backward(loss)
+            self.opt.step()
             #loss += sum_outputs.loss * self.args.w2
             ### KL ###
             #loss += (self.args.lambda_ * self.kl_loss(Rep1, Rep2))
@@ -237,6 +240,8 @@ class SumSim(pl.LightningModule):
             return loss
         else:
             loss = sim_outputs.loss
+            self.manual_backward(loss)
+            self.opt.step()
             self.log('train_loss', loss, on_step=True, prog_bar=True, logger=True)
             #print(loss)
             return loss
