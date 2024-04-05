@@ -84,7 +84,7 @@ class BartBaseLineFineTuned(pl.LightningModule):
         self.model = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
         self.model = self.model.to(self.args.device)
         self.tokenizer = BartTokenizer.from_pretrained(self.args.sum_model)
-        
+        self.automatic_optimization = False
 
 
     def is_logger(self):
@@ -119,17 +119,21 @@ class BartBaseLineFineTuned(pl.LightningModule):
             decoder_attention_mask = batch["target_mask"]
             
         )
+        
 
         if self.args.custom_loss:
 
             loss = outputs.loss
-
+            self.manual_backward(loss)
+            self.opt.step()
             
             self.log('train_loss', loss, on_step=True, prog_bar=True, logger=True)
             # print(loss)
             return loss
         else:
             loss = outputs.loss
+            self.manual_backward(loss)  
+            self.opt.step()
             self.log('train_loss', loss, on_step=True, prog_bar=True, logger=True)
             #print(loss)
             return loss
