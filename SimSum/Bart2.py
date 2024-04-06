@@ -116,7 +116,7 @@ class SumSim(pl.LightningModule):
             decoder_attention_mask =  decoder_attention_mask,
             # lm_labels = labels
         )
-        lm_logits = F.linear(outputs[0], self.model.shared.weight, bias=self.final_logits_bias)
+        lm_logits = F.linear(outputs[0], self.simplifier.shared.weight, bias=self.simplifier.final_logits_bias)
         loss_fct = nn.CrossEntropyLoss()
             # TODO(SS): do we need to ignore pad tokens in lm_labels?
         loss = loss_fct(lm_logits.view(-1, self.config.vocab_size), labels.view(-1))
