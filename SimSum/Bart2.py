@@ -91,11 +91,12 @@ class SumSim(pl.LightningModule):
         self.summarizer = self.summarizer.to(self.args.device)
 
 
-        self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
+        self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sim_model)
         # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
+        self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sim_model)
         self.simplifier = self.simplifier.model.to(self.args.device)
-        self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sum_model)
-        print(self.simplifier)
+
+        # print(self.simplifier)
         self.automatic_optimization = False
 
 
@@ -106,8 +107,8 @@ class SumSim(pl.LightningModule):
     attention_mask = None,
     decoder_input_ids = None,
     decoder_attention_mask = None, labels = None):
-        print(self.summarizer)
-        print(self.simplifier)
+        # print(self.summarizer)
+        # print(self.simplifier)
         outputs = self.simplifier(
             input_ids = input_ids,
             attention_mask = attention_mask,
@@ -115,8 +116,12 @@ class SumSim(pl.LightningModule):
             decoder_attention_mask =  decoder_attention_mask,
             lm_labels = labels
         )
+        lm_logits = F.linear(outputs[0], self.model.shared.weight, bias=self.final_logits_bias)
+        loss_fct = nn.CrossEntropyLoss()
+            # TODO(SS): do we need to ignore pad tokens in lm_labels?
+        loss = loss_fct(lm_logits.view(-1, self.config.vocab_size), labels.view(-1))
 
-        return outputs
+        return outputs,loss
 
 
 
@@ -187,7 +192,7 @@ class SumSim(pl.LightningModule):
         
         
         # forward pass
-        sim_outputs  = self(
+        sim_outputs,loss  = self(
             input_ids = padded_summary_ids,
             attention_mask = summary_attention_mask,
             labels = labels,
@@ -224,7 +229,9 @@ class SumSim(pl.LightningModule):
             - ratio: control the ratio of sentences we want to compute complexity for training.
             - lambda: control the weight of the complexity loss.
             '''
-            loss = sim_outputs.masked_lm_loss * self.args.w1
+            # loss = sim_outputs.masked_lm_loss * self.args.w1
+            loss = loss * self.args.w1
+
             self.manual_backward(loss)
             self.opt.step()
             #loss += sum_outputs.loss * self.args.w2
