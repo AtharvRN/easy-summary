@@ -95,6 +95,7 @@ class SumSim(pl.LightningModule):
         # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
         self.simplifier = self.simplifier.model.to(self.args.device)
         self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sum_model)
+        print(self.simplifier)
         self.automatic_optimization = False
 
 
