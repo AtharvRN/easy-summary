@@ -142,14 +142,14 @@ class SumSim(pl.LightningModule):
         # compute the loss between summarization and simplification target
         # sum_outputs.loss
 
-        sum_outputs = self.summarizer(
-            input_ids = src_ids,
-            attention_mask  = src_mask,
-            lm_labels = labels,
-            decoder_attention_mask = batch['target_mask']
-        )
+        # sum_outputs = self.summarizer(
+        #     input_ids = src_ids,
+        #     attention_mask  = src_mask,
+        #     lm_labels = labels,
+        #     decoder_attention_mask = batch['target_mask']
+        # )
         
-        H1 = sum_outputs.encoder_last_hidden_state
+        # H1 = sum_outputs.encoder_last_hidden_state
 
         # generate summary
         # print(inputs)
@@ -193,15 +193,15 @@ class SumSim(pl.LightningModule):
         )
         # print(sim_outputs)
 
-        H2 = sim_outputs.encoder_last_hidden_state
+        # H2 = sim_outputs.encoder_last_hidden_state
         
         ## CosSim
-        Rep1 = torch.matmul(H1, self.W)
-        Rep2 = torch.matmul(H2, self.W)
-        Rep1 = self.relu(Rep1)
-        Rep2 = self.relu(Rep2)
-        CosSim = nn.CosineSimilarity(dim=2, eps=1e-6)
-        sim_score = CosSim(Rep1, Rep2)
+        # Rep1 = torch.matmul(H1, self.W)
+        # Rep2 = torch.matmul(H2, self.W)
+        # Rep1 = self.relu(Rep1)
+        # Rep2 = self.relu(Rep2)
+        # CosSim = nn.CosineSimilarity(dim=2, eps=1e-6)
+        # sim_score = CosSim(Rep1, Rep2)
 
         ## KL loss
         # H1 = torch.transpose((torch.transpose(H1, 1,2)@self.Q), 1,2)
@@ -230,7 +230,7 @@ class SumSim(pl.LightningModule):
             #loss += (self.args.lambda_ * self.kl_loss(Rep1, Rep2))
             
             ### CosSim ###
-            loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
+            # loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
 
 
 
