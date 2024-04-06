@@ -145,15 +145,15 @@ class SumSim(pl.LightningModule):
         sum_outputs = self.summarizer(
             input_ids = src_ids,
             attention_mask  = src_mask,
-            labels = labels,
+            im_labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
         
-        #H1 = sum_outputs.encoder_last_hidden_state
+        H1 = sum_outputs.encoder_last_hidden_state
 
         # generate summary
-        print(inputs)
-        print(inputs['input_ids'].shape)
+        # print(inputs)
+        # print(inputs['input_ids'].shape)
         summary_ids = self.summarizer.generate(
             inputs['input_ids'].to(self.args.device),
             num_beams = 5,
@@ -188,19 +188,20 @@ class SumSim(pl.LightningModule):
         sim_outputs  = self(
             input_ids = padded_summary_ids,
             attention_mask = summary_attention_mask,
-            # labels = labels,
+            im_labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
-        print(sim_outputs.shape)
-        #H2 = sim_outputs.encoder_last_hidden_state
+        # print(sim_outputs)
+
+        H2 = sim_outputs.encoder_last_hidden_state
         
         ## CosSim
-        # Rep1 = torch.matmul(H1, self.W)
-        # Rep2 = torch.matmul(H2, self.W)
-        # Rep1 = self.relu(Rep1)
-        # Rep2 = self.relu(Rep2)
-        # CosSim = nn.CosineSimilarity(dim=2, eps=1e-6)
-        # sim_score = CosSim(Rep1, Rep2)
+        Rep1 = torch.matmul(H1, self.W)
+        Rep2 = torch.matmul(H2, self.W)
+        Rep1 = self.relu(Rep1)
+        Rep2 = self.relu(Rep2)
+        CosSim = nn.CosineSimilarity(dim=2, eps=1e-6)
+        sim_score = CosSim(Rep1, Rep2)
 
         ## KL loss
         # H1 = torch.transpose((torch.transpose(H1, 1,2)@self.Q), 1,2)
@@ -221,7 +222,7 @@ class SumSim(pl.LightningModule):
             - ratio: control the ratio of sentences we want to compute complexity for training.
             - lambda: control the weight of the complexity loss.
             '''
-            loss = sim_outputs.loss * self.args.w1
+            loss = sim_outputs.masked_lm_loss * self.args.w1
             self.manual_backward(loss)
             self.opt.step()
             #loss += sum_outputs.loss * self.args.w2
@@ -229,7 +230,7 @@ class SumSim(pl.LightningModule):
             #loss += (self.args.lambda_ * self.kl_loss(Rep1, Rep2))
             
             ### CosSim ###
-            #loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
+            loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
 
 
 
@@ -242,7 +243,7 @@ class SumSim(pl.LightningModule):
             # print(loss)
             return loss
         else:
-            loss = sim_outputs.loss
+            loss = sim_outputs.masked_lm_loss
             self.manual_backward(loss)
             self.opt.step()
             self.log('train_loss', loss, on_step=True, prog_bar=True, logger=True)
