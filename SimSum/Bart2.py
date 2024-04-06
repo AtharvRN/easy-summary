@@ -95,8 +95,11 @@ class SumSim(pl.LightningModule):
         # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
         self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sim_model)
         self.simplifier = self.simplifier.model.to(self.args.device)
-
-        # print(self.simplifier)
+        
+        print("Summarizer")
+        print(self.summarizer)
+        print("Simplifier")
+        print(self.simplifier)
         self.automatic_optimization = False
 
 
@@ -116,6 +119,7 @@ class SumSim(pl.LightningModule):
             decoder_attention_mask =  decoder_attention_mask,
             # lm_labels = labels
         )
+
         lm_logits = F.linear(outputs[0], self.simplifier.shared.weight, bias=self.simplifier.final_logits_bias)
         loss_fct = nn.CrossEntropyLoss()
             # TODO(SS): do we need to ignore pad tokens in lm_labels?
