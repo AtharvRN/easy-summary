@@ -85,13 +85,14 @@ class SumSim(pl.LightningModule):
         self.args = args
         self.save_hyperparameters()
         # Load pre-trained model and tokenizer
-        #self.summarizer = BartModel.from_pretrained("facebook/bart-large-cnn")
-        self.summarizer = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
+        self.summarizer = BartModel.from_pretrained("facebook/bart-large-cnn")
+        # self.summarizer = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
         self.summarizer_tokenizer = BartTokenizerFast.from_pretrained(self.args.sum_model)
         self.summarizer = self.summarizer.to(self.args.device)
 
+        self.simplifier = BartModel.from_pretrained("facebook/bart-large-cnn")
 
-        self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sim_model)
+        # self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sim_model)
         # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
         self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sim_model)
         self.simplifier = self.simplifier.model.to(self.args.device)
