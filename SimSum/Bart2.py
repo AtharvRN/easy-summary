@@ -91,7 +91,7 @@ class SumSim(pl.LightningModule):
         self.summarizer = self.summarizer.to(self.args.device)
 
 
-        self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sum_model)
+        self.simplifier = BartForConditionalGeneration.from_pretrained(self.args.sim_model)
         # self.simplifier = BartFineTuner.load_from_checkpoint("experiments/exp_WikiLarge_BARTSingle/checkpoint-epoch=2.ckpt")
         self.simplifier = self.simplifier.model.to(self.args.device)
         self.simplifier_tokenizer = BartTokenizerFast.from_pretrained(self.args.sim_model)
@@ -188,7 +188,7 @@ class SumSim(pl.LightningModule):
         sim_outputs  = self(
             input_ids = padded_summary_ids,
             attention_mask = summary_attention_mask,
-            labels = labels,
+            # labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
         #H2 = sim_outputs.encoder_last_hidden_state
