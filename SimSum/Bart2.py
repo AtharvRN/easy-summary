@@ -114,7 +114,7 @@ class SumSim(pl.LightningModule):
             attention_mask = attention_mask,
             decoder_input_ids = decoder_input_ids,
             decoder_attention_mask =  decoder_attention_mask,
-            lm_labels = labels
+            # lm_labels = labels
         )
         lm_logits = F.linear(outputs[0], self.model.shared.weight, bias=self.final_logits_bias)
         loss_fct = nn.CrossEntropyLoss()
