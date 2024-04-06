@@ -188,7 +188,7 @@ class SumSim(pl.LightningModule):
         sim_outputs  = self(
             input_ids = padded_summary_ids,
             attention_mask = summary_attention_mask,
-            lm_labels = labels,
+            labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
         # print(sim_outputs)
