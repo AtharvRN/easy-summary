@@ -411,7 +411,9 @@ class SumSim(pl.LightningModule):
       p.add_argument('-Lambda', '--lambda_', type = int, default = 11)
       # BRIO: Yale-LILY/brio-cnndm-uncased ainize/bart-base-cnn
       p.add_argument('-Summarizer','--sum_model', default='ainize/bart-base-cnn')
-      p.add_argument('-Simplifier','--sim_model', default='facebook/bart-base')
+      p.add_argument('-Simplifier','--sim_model', default='ainize/bart-base-cnn')
+
+    #   p.add_argument('-Simplifier','--sim_model', default='facebook/bart-base')
       p.add_argument('-TrainBS','--train_batch_size',type=int, default=6)
       p.add_argument('-ValidBS','--valid_batch_size',type=int, default=6)
       p.add_argument('-lr','--learning_rate',type=float, default=5e-5)
