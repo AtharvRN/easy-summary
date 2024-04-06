@@ -191,7 +191,7 @@ class SumSim(pl.LightningModule):
             # labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
-        print(sim_outputs)
+        print(sim_outputs.shape)
         #H2 = sim_outputs.encoder_last_hidden_state
         
         ## CosSim
