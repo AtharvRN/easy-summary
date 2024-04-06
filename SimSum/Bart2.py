@@ -105,6 +105,7 @@ class SumSim(pl.LightningModule):
     attention_mask = None,
     decoder_input_ids = None,
     decoder_attention_mask = None, labels = None):
+        print(self.summarizer)
         print(self.simplifier)
         outputs = self.simplifier(
             input_ids = input_ids,
