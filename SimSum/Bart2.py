@@ -111,7 +111,7 @@ class SumSim(pl.LightningModule):
             attention_mask = attention_mask,
             decoder_input_ids = decoder_input_ids,
             decoder_attention_mask =  decoder_attention_mask,
-            im_labels = labels
+            lm_labels = labels
         )
 
         return outputs
