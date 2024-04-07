@@ -156,12 +156,12 @@ class SumSim(pl.LightningModule):
         # compute the loss between summarization and simplification target
         # sum_outputs.loss
 
-        # sum_outputs = self.summarizer(
-        #     input_ids = src_ids,
-        #     attention_mask  = src_mask,
-        #     lm_labels = labels,
-        #     decoder_attention_mask = batch['target_mask']
-        # )
+        sum_outputs = self.summarizer(
+            input_ids = src_ids,
+            attention_mask  = src_mask,
+            lm_labels = labels,
+            decoder_attention_mask = batch['target_mask']
+        )
         
         # H1 = sum_outputs.encoder_last_hidden_state
 
@@ -205,17 +205,23 @@ class SumSim(pl.LightningModule):
             labels = labels,
             decoder_attention_mask = batch['target_mask']
         )
+        sim_target_outputs  = self(
+            input_ids = labels,
+            attention_mask = summary_attention_mask,
+            # labels = labels,
+            decoder_attention_mask = batch['target_mask']
+        )
         # print(sim_outputs)
-
-        # H2 = sim_outputs.encoder_last_hidden_state
+        H1 = sim_target_outputs.encoder_last_hidden_state
+        H2 = sim_outputs.encoder_last_hidden_state
         
         ## CosSim
-        # Rep1 = torch.matmul(H1, self.W)
-        # Rep2 = torch.matmul(H2, self.W)
-        # Rep1 = self.relu(Rep1)
-        # Rep2 = self.relu(Rep2)
-        # CosSim = nn.CosineSimilarity(dim=2, eps=1e-6)
-        # sim_score = CosSim(Rep1, Rep2)
+        Rep1 = torch.matmul(H1, self.W)
+        Rep2 = torch.matmul(H2, self.W)
+        Rep1 = self.relu(Rep1)
+        Rep2 = self.relu(Rep2)
+        CosSim = nn.CosineSimilarity(dim=2, eps=1e-6)
+        sim_score = CosSim(Rep1, Rep2)
 
         ## KL loss
         # H1 = torch.transpose((torch.transpose(H1, 1,2)@self.Q), 1,2)
@@ -239,15 +245,16 @@ class SumSim(pl.LightningModule):
             # loss = sim_outputs.masked_lm_loss * self.args.w1
             loss = sim_outputs.loss * self.args.w1
 
-            self.manual_backward(loss)
-            self.opt.step()
+            # self.manual_backward(loss)
+            # self.opt.step()
             #loss += sum_outputs.loss * self.args.w2
             ### KL ###
             #loss += (self.args.lambda_ * self.kl_loss(Rep1, Rep2))
             
             ### CosSim ###
-            # loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
-
+            loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
+            self.manual_backward(loss)
+            self.opt.step()
 
 
 
@@ -260,6 +267,8 @@ class SumSim(pl.LightningModule):
             return loss
         else:
             loss = sim_outputs.loss
+            loss += (-self.args.lambda_ * (sim_score.mean(dim=1).mean(dim=0)))
+
             self.manual_backward(loss)
             self.opt.step()
             self.log('train_loss', loss, on_step=True, prog_bar=True, logger=True)
@@ -274,6 +283,7 @@ class SumSim(pl.LightningModule):
         logs = {"val_loss": loss}
 
         self.log('val_loss', loss, batch_size = self.args.valid_batch_size)
+        self.model.model.save_pretrained(args.output_dir)
         return torch.tensor(loss, dtype=float)
 
     def sari_validation_step(self, batch):
